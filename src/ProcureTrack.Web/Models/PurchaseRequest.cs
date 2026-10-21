@@ -42,5 +42,7 @@ public class PurchaseRequest
 
     /// <summary>Display identifier such as PR-00042. Computed, not stored.</summary>
     [NotMapped]
-    public string RequestNumber => $"PR-{Id:D5}";
+    public string RequestNumber => FormatRequestNumber(Id);
+
+    public static string FormatRequestNumber(int id) => $"PR-{id:D5}";
 }

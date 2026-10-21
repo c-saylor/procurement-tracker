@@ -1,0 +1,59 @@
+@model PurchaseRequestIndexViewModel
+
+@* Kept as a partial so jQuery can later swap just this section via AJAX (Oct 23). *@
+<div id="request-results">
+    @if (Model.Requests.Count == 0)
+    {
+        <div class="text-center text-body-secondary py-5 border rounded bg-body">
+            <p class="mb-2 fw-semibold">No purchase requests match these filters.</p>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+        </div>
+    }
+    else
+    {
+        <p class="text-body-secondary small mb-2" aria-live="polite">
+            Showing @Model.Requests.Count request(s) totaling @Model.TotalAmount.ToString("C")
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <caption class="visually-hidden">Purchase requests</caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Request</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Vendor</th>
+                        <th scope="col" class="text-end">Amount</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Required by</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Requests)
+                    {
+                        <tr>
+                            <td class="text-nowrap">
+                                <a asp-action="Details" asp-route-id="@r.Id">@r.RequestNumber</a>
+                            </td>
+                            <td>@r.Title</td>
+                            <td>@r.DepartmentName</td>
+                            <td>@r.VendorName</td>
+                            <td class="text-end text-nowrap">@r.Amount.ToString("C")</td>
+                            <td class="text-nowrap">@r.SubmittedDate.ToString("MMM d, yyyy")</td>
+                            <td class="text-nowrap">@r.RequiredByDate.ToString("MMM d, yyyy")</td>
+                            <td><partial name="_StatusBadge" model="r.Status" /></td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary">
+                                    View<span class="visually-hidden"> @r.RequestNumber</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

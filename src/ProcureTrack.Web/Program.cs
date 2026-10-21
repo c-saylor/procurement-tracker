@@ -33,6 +33,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// Single-locale internal app: format currency and dates as en-US regardless of the server's regional settings.
+app.UseRequestLocalization("en-US");
 app.UseRouting();
 
 app.UseAuthorization();

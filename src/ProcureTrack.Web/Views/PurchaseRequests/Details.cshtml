@@ -1,0 +1,101 @@
+@model PurchaseRequestDetailsViewModel
+@{
+    var r = Model.Request;
+    ViewData["Title"] = r.RequestNumber;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Purchase Requests</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@r.RequestNumber</li>
+    </ol>
+</nav>
+
+<div class="mb-3">
+    <h1 class="h3 mb-1">@r.Title</h1>
+    <div class="text-body-secondary">
+        @r.RequestNumber &middot; <partial name="_StatusBadge" model="r.Status" />
+    </div>
+</div>
+
+@if (!Model.CanEdit)
+{
+    <div class="alert alert-secondary" role="status">
+        This request has been @r.Status.ToString().ToLowerInvariant() and is now closed to editing.
+    </div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header fw-semibold">Request details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Department</dt>
+                    <dd class="col-sm-8">@r.Department.Name</dd>
+
+                    <dt class="col-sm-4">Vendor</dt>
+                    <dd class="col-sm-8">
+                        @r.Vendor.Name
+                        @if (!r.Vendor.IsActive)
+                        {
+                            <span class="badge text-bg-secondary ms-1">Inactive vendor</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Amount</dt>
+                    <dd class="col-sm-8">@r.Amount.ToString("C")</dd>
+
+                    <dt class="col-sm-4">Requested by</dt>
+                    <dd class="col-sm-8">@r.RequestedBy</dd>
+
+                    <dt class="col-sm-4">Submitted</dt>
+                    <dd class="col-sm-8">@r.SubmittedDate.ToString("MMM d, yyyy h:mm tt") UTC</dd>
+
+                    <dt class="col-sm-4">Required by</dt>
+                    <dd class="col-sm-8">@r.RequiredByDate.ToString("MMM d, yyyy")</dd>
+
+                    @if (!string.IsNullOrWhiteSpace(r.Description))
+                    {
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8 text-preline">@r.Description</dd>
+                    }
+
+                    <dt class="col-sm-4">Business justification</dt>
+                    <dd class="col-sm-8 text-preline mb-0">@r.BusinessJustification</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header fw-semibold">Approval history</div>
+            @if (r.ApprovalRecords.Count == 0)
+            {
+                <div class="card-body text-body-secondary">
+                    No decision recorded yet. This request is awaiting review.
+                </div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var a in r.ApprovalRecords.OrderByDescending(a => a.ActedAt))
+                    {
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between gap-2">
+                                <strong>@a.Action</strong>
+                                <small class="text-body-secondary text-nowrap">@a.ActedAt.ToString("MMM d, yyyy h:mm tt") UTC</small>
+                            </div>
+                            <div class="small">by @a.ActedBy</div>
+                            @if (!string.IsNullOrWhiteSpace(a.Notes))
+                            {
+                                <p class="mb-0 mt-1 small text-preline">@a.Notes</p>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>

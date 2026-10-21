@@ -1,0 +1,48 @@
+@model PurchaseRequestIndexViewModel
+@{
+    ViewData["Title"] = "Purchase Requests";
+}
+
+<h1 class="h3 mb-3">Purchase Requests</h1>
+
+<form method="get" asp-action="Index" class="card card-body mb-3" role="search" aria-label="Filter purchase requests">
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.Search" class="form-label"></label>
+            <input asp-for="Filter.Search" class="form-control" placeholder="Title or requester" />
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.DepartmentId" class="form-label"></label>
+            <select asp-for="Filter.DepartmentId" asp-items="Model.Departments" class="form-select">
+                <option value="">All departments</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.VendorId" class="form-label"></label>
+            <select asp-for="Filter.VendorId" asp-items="Model.Vendors" class="form-select">
+                <option value="">All vendors</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.Status" class="form-label"></label>
+            <select asp-for="Filter.Status" asp-items="Model.Statuses" class="form-select">
+                <option value="">All statuses</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.SubmittedFrom" class="form-label"></label>
+            <input asp-for="Filter.SubmittedFrom" type="date" class="form-control" />
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label asp-for="Filter.SubmittedTo" class="form-label"></label>
+            <input asp-for="Filter.SubmittedTo" type="date" class="form-control" />
+            <span asp-validation-for="Filter.SubmittedTo" class="text-danger small"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary">Apply filters</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+<partial name="_RequestTable" model="Model" />

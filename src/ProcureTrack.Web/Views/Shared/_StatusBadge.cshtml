@@ -1,0 +1,11 @@
+@model RequestStatus
+@{
+    var css = Model switch
+    {
+        RequestStatus.Approved => "text-bg-success",
+        RequestStatus.Rejected => "text-bg-danger",
+        _ => "text-bg-warning",
+    };
+}
+
+<span class="badge @css">@Model</span>
