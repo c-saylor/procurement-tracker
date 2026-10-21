@@ -1,19 +1,22 @@
 @model PurchaseRequestIndexViewModel
+@{
+    var summary = Model.Requests.Count == 0
+        ? "No purchase requests match these filters."
+        : $"Showing {Model.Requests.Count} request(s) totaling {Model.TotalAmount:C}";
+}
 
-@* Kept as a partial so jQuery can later swap just this section via AJAX (Oct 23). *@
-<div id="request-results">
+@* Returned on its own for AJAX filter updates. data-result-summary feeds a screen-reader announcement. *@
+<div id="request-results" data-result-summary="@summary">
     @if (Model.Requests.Count == 0)
     {
         <div class="text-center text-body-secondary py-5 border rounded bg-body">
-            <p class="mb-2 fw-semibold">No purchase requests match these filters.</p>
+            <p class="mb-2 fw-semibold">@summary</p>
             <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Clear filters</a>
         </div>
     }
     else
     {
-        <p class="text-body-secondary small mb-2" aria-live="polite">
-            Showing @Model.Requests.Count request(s) totaling @Model.TotalAmount.ToString("C")
-        </p>
+        <p class="text-body-secondary small mb-2">@summary</p>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">

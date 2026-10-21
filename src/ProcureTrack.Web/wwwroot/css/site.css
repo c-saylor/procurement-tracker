@@ -51,3 +51,10 @@ body {
 .kpi-rejected {
   border-left-color: var(--bs-danger);
 }
+
+/* AJAX loading state for the results table. */
+.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+}
