@@ -12,6 +12,16 @@ builder.Services.AddDbContext<ProcureTrackDbContext>(options =>
 
 var app = builder.Build();
 
+// Development convenience: create or upgrade the database and load sample data on startup.
+// Production would apply reviewed migration scripts instead (see README).
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ProcureTrackDbContext>();
+    await db.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(db);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
