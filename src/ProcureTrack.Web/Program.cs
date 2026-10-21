@@ -1,7 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using ProcureTrack.Web.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ProcureTrackDbContext>(options => 
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("ProcureTrack")
+        ?? throw new InvalidOperationException("Connection string 'ProcureTrack' was not found.")));
 
 var app = builder.Build();
 
