@@ -1,8 +1,157 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">Procurement Dashboard</h1>
+        <p class="text-body-secondary mb-0 small">Live figures calculated from all purchase requests.</p>
+    </div>
+    <a asp-controller="PurchaseRequests" asp-action="Create" class="btn btn-primary">New request</a>
 </div>
+
+@if (Model.TotalRequests == 0)
+{
+    <div class="text-center text-body-secondary py-5 border rounded bg-body">
+        <p class="fw-semibold mb-2">No purchase requests yet.</p>
+        <a asp-controller="PurchaseRequests" asp-action="Create" class="btn btn-primary btn-sm">Submit the first request</a>
+    </div>
+}
+else
+{
+    <section aria-label="Key figures" class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 kpi-card">
+                <div class="card-body">
+                    <div class="text-body-secondary small text-uppercase fw-semibold">Total requests</div>
+                    <div class="display-6 fw-semibold">@Model.TotalRequests</div>
+                    <div class="small text-body-secondary">@Model.TotalAmount.ToString("C") requested</div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a asp-controller="PurchaseRequests" asp-action="Index" class="small">View all requests</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 kpi-card kpi-pending">
+                <div class="card-body">
+                    <div class="text-body-secondary small text-uppercase fw-semibold">Pending approvals</div>
+                    <div class="display-6 fw-semibold">@Model.PendingCount</div>
+                    <div class="small text-body-secondary">@Model.PendingAmount.ToString("C") awaiting review</div>
+                    @if (Model.StalePendingCount > 0)
+                    {
+                        <div class="small text-warning-emphasis fw-semibold mt-1">
+                            @Model.StalePendingCount waiting more than @Model.StalePendingDays days
+                        </div>
+                    }
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a asp-controller="PurchaseRequests" asp-action="Index" asp-route-Status="Pending" class="small">Review pending</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 kpi-card kpi-approved">
+                <div class="card-body">
+                    <div class="text-body-secondary small text-uppercase fw-semibold">Approved spending</div>
+                    <div class="display-6 fw-semibold">@Model.ApprovedAmount.ToString("C0")</div>
+                    <div class="small text-body-secondary">@Model.ApprovedCount approved requests</div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a asp-controller="PurchaseRequests" asp-action="Index" asp-route-Status="Approved" class="small">View approved</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 kpi-card kpi-rejected">
+                <div class="card-body">
+                    <div class="text-body-secondary small text-uppercase fw-semibold">Rejected requests</div>
+                    <div class="display-6 fw-semibold">@Model.RejectedCount</div>
+                    <div class="small text-body-secondary">Each with a recorded reason</div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a asp-controller="PurchaseRequests" asp-action="Index" asp-route-Status="Rejected" class="small">View rejected</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <section class="col-lg-8" aria-labelledby="recent-heading">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 id="recent-heading" class="h6 mb-0">Recently submitted</h2>
+                    <a asp-controller="PurchaseRequests" asp-action="Index" class="small">View all</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <caption class="visually-hidden">Five most recently submitted purchase requests</caption>
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Request</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Department</th>
+                                <th scope="col" class="text-end">Amount</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.RecentRequests)
+                            {
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <a asp-controller="PurchaseRequests" asp-action="Details" asp-route-id="@r.Id">@r.RequestNumber</a>
+                                    </td>
+                                    <td>@r.Title</td>
+                                    <td>@r.DepartmentName</td>
+                                    <td class="text-end text-nowrap">@r.Amount.ToString("C")</td>
+                                    <td><partial name="_StatusBadge" model="r.Status" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-lg-4" aria-labelledby="dept-heading">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h2 id="dept-heading" class="h6 mb-0">Approved spending by department</h2>
+                </div>
+                <div class="card-body">
+                    @if (Model.ApprovedByDepartment.Count == 0)
+                    {
+                        <p class="text-body-secondary mb-0">No approved requests yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var d in Model.ApprovedByDepartment)
+                            {
+                                <li class="mb-3">
+                                    <div class="d-flex justify-content-between small">
+                                        <span class="fw-semibold">@d.Department</span>
+                                        <span>@d.Amount.ToString("C")</span>
+                                    </div>
+                                    <div class="progress" role="progressbar" style="height: .5rem"
+                                         aria-label="@d.Department share of approved spending"
+                                         aria-valuenow="@d.PercentOfTotal" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar" style="width: @(d.PercentOfTotal)%"></div>
+                                    </div>
+                                    <div class="small text-body-secondary">
+                                        @d.RequestCount request(s) &middot; @d.PercentOfTotal% of approved spending
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </section>
+    </div>
+}

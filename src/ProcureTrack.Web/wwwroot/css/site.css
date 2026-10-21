@@ -38,3 +38,16 @@ body {
 .validation-summary-valid {
   display: none;
 }
+
+.kpi-card {
+  border-left: 4px solid var(--bs-secondary-border-subtle);
+}
+.kpi-pending {
+  border-left-color: var(--bs-warning);
+}
+.kpi-approved {
+  border-left-color: var(--bs-success);
+}
+.kpi-rejected {
+  border-left-color: var(--bs-danger);
+}
