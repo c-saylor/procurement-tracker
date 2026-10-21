@@ -8,7 +8,10 @@
         <h1 class="h3 mb-0">Procurement Dashboard</h1>
         <p class="text-body-secondary mb-0 small">Live figures calculated from all purchase requests.</p>
     </div>
-    <a asp-controller="PurchaseRequests" asp-action="Create" class="btn btn-primary">New request</a>
+    @if (User.IsInRole(AppRoles.Requester))
+    {
+        <a asp-controller="PurchaseRequests" asp-action="Create" class="btn btn-primary">New request</a>
+    }   
 </div>
 
 @if (Model.TotalRequests == 0)

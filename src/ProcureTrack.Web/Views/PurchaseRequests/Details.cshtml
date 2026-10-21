@@ -27,7 +27,7 @@
     }
 </div>
 
-@if (!Model.CanEdit)
+@if (r.Status != RequestStatus.Pending)
 {
     <div class="alert alert-secondary" role="status">
         This request has been @r.Status.ToString().ToLowerInvariant() and is now closed to editing.
@@ -78,21 +78,17 @@
     </div>
 
     <div class="col-lg-4">
-                @if (Model.CanDecide)
+        @if (Model.CanDecide)
         {
             <div class="card border-primary mb-3">
                 <div class="card-header fw-semibold">Record a decision</div>
                 <div class="card-body">
+                    <p class="small text-body-secondary mb-3">Deciding as <strong>@User.Identity?.Name</strong></p>
+
                     @* No action attribute: each button supplies its own via asp-action (rendered as formaction). *@
                     <form method="post" asp-antiforgery="true" id="decision-form" novalidate>
                         <input type="hidden" asp-for="Decision.RowVersion" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="Decision.ActedBy" class="form-label"></label>
-                            <input asp-for="Decision.ActedBy" class="form-control" autocomplete="name" />
-                            <span asp-validation-for="Decision.ActedBy" class="text-danger small"></span>
-                        </div>
 
                         <div class="mb-3">
                             <label asp-for="Decision.Notes" class="form-label"></label>
@@ -109,6 +105,13 @@
                 </div>
             </div>
         }
+        else if (r.Status == RequestStatus.Pending && Model.IsOwnRequest && User.IsInRole(AppRoles.Approver))
+        {
+            <div class="alert alert-info small" role="note">
+                You submitted this request, so a different approver must decide it (separation of duties).
+            </div>
+        }
+
         <div class="card">
             <div class="card-header fw-semibold">Approval history</div>
             @if (r.ApprovalRecords.Count == 0)

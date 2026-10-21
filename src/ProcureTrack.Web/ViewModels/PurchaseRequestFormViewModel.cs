@@ -40,11 +40,6 @@ public class PurchaseRequestFormViewModel
     [Display(Name = "Business justification")]
     public string? BusinessJustification { get; set; }
 
-    [Required(ErrorMessage = "Enter the requester's name.")]
-    [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
-    [Display(Name = "Requested by")]
-    public string? RequestedBy { get; set; }
-
     /// <summary>Concurrency token from when the edit form was opened (edit only).</summary>
     public byte[]? RowVersion { get; set; }
 

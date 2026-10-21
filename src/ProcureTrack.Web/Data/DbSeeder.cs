@@ -97,7 +97,7 @@ public static class DbSeeder
             new("Onboarding supplies for new hires", "HR", "Contoso Office Supply", 455.60m, 8, 14, RequestStatus.Pending,
                 "Renee Patterson", "Desk supplies for six incoming employees."),
             new("Earned value management training", "PC", "Litware Training Group", 6200.00m, 7, 45, RequestStatus.Pending,
-                "Owen Gallagher", "Build team capability in earned value reporting."),
+                "Priya Natarajan", "Build team capability in earned value reporting."),
             new("Environmental sampling kits", "FAC", "Tailspin Lab Instruments", 3475.00m, 6, 30, RequestStatus.Pending,
                 "Dana Whitfield", "Replace expired sampling kits used for routine air quality checks."),
             new("Backup storage expansion", "IT", "Northwind IT Services", 14250.00m, 5, 30, RequestStatus.Pending,

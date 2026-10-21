@@ -1,0 +1,43 @@
+@model IReadOnlyList<DemoUser>
+@{
+    ViewData["Title"] = "Sign in";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7">
+        <h1 class="h3 mb-3">Sign in to ProcureTrack</h1>
+
+        <div class="alert alert-info small" role="note">
+            <strong>Demo sign-in.</strong> Choose a fictional user to explore the app with that user's role.
+            There are no passwords: this page demonstrates role-based authorization and is
+            <em>not</em> production authentication.
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="list-group">
+            @foreach (var u in Model)
+            {
+                <form asp-action="Login" method="post"
+                      class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <input type="hidden" name="userKey" value="@u.Key" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                    <div>
+                        <div class="fw-semibold">@u.DisplayName</div>
+                        <div class="small text-body-secondary">@u.Title &middot; @string.Join(" + ", u.Roles)</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        Sign in<span class="visually-hidden"> as @u.DisplayName</span>
+                    </button>
+                </form>
+            }
+        </div>
+
+        <ul class="small text-body-secondary mt-3 mb-0">
+            <li><strong>Requester:</strong> submits requests and edits or deletes their own pending requests.</li>
+            <li><strong>Approver:</strong> approves or rejects other people's pending requests.</li>
+            <li><strong>Both:</strong> can approve others' requests but never their own (separation of duties).</li>
+        </ul>
+    </div>
+</div>
