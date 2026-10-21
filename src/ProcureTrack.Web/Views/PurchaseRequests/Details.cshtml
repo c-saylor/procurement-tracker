@@ -78,6 +78,37 @@
     </div>
 
     <div class="col-lg-4">
+                @if (Model.CanDecide)
+        {
+            <div class="card border-primary mb-3">
+                <div class="card-header fw-semibold">Record a decision</div>
+                <div class="card-body">
+                    @* No action attribute: each button supplies its own via asp-action (rendered as formaction). *@
+                    <form method="post" asp-antiforgery="true" id="decision-form" novalidate>
+                        <input type="hidden" asp-for="Decision.RowVersion" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Decision.ActedBy" class="form-label"></label>
+                            <input asp-for="Decision.ActedBy" class="form-control" autocomplete="name" />
+                            <span asp-validation-for="Decision.ActedBy" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Decision.Notes" class="form-label"></label>
+                            <textarea asp-for="Decision.Notes" class="form-control" rows="3" aria-describedby="decisionNotesHelp"></textarea>
+                            <div id="decisionNotesHelp" class="form-text">Optional for approval. Required when rejecting.</div>
+                            <span asp-validation-for="Decision.Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success" asp-action="Approve" asp-route-id="@r.Id">Approve</button>
+                            <button type="submit" class="btn btn-outline-danger" asp-action="Reject" asp-route-id="@r.Id">Reject</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
         <div class="card">
             <div class="card-header fw-semibold">Approval history</div>
             @if (r.ApprovalRecords.Count == 0)
@@ -108,3 +139,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

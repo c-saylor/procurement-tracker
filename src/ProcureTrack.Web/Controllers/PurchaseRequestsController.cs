@@ -95,10 +95,87 @@ public class PurchaseRequestsController : Controller
         return View(model);
     }
 
-    // ---------- Details ----------
+        // ---------- Details ----------
 
     // GET /PurchaseRequests/Details/5
     public async Task<IActionResult> Details(int id)
+    {
+        var model = await BuildDetailsViewModelAsync(id, decision: null);
+        return model is null ? NotFound() : View(model);
+    }
+
+    // ---------- Approve / Reject ----------
+
+    // POST /PurchaseRequests/Approve/5
+    // [Bind(Prefix = "Decision")] matches form fields named "Decision.ActedBy", "Decision.Notes", etc.
+    [HttpPost]
+    public Task<IActionResult> Approve(int id, [Bind(Prefix = "Decision")] DecisionViewModel decision) =>
+        RecordDecisionAsync(id, decision, ApprovalAction.Approved);
+
+    // POST /PurchaseRequests/Reject/5
+    [HttpPost]
+    public Task<IActionResult> Reject(int id, [Bind(Prefix = "Decision")] DecisionViewModel decision) =>
+        RecordDecisionAsync(id, decision, ApprovalAction.Rejected);
+
+    private async Task<IActionResult> RecordDecisionAsync(int id, DecisionViewModel decision, ApprovalAction action)
+    {
+        var request = await _db.PurchaseRequests.FirstOrDefaultAsync(p => p.Id == id);
+
+        if (request is null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return await RedisplayDetailsAsync(id, decision);
+        }
+
+        // Guard against deciding on a version the approver never saw.
+        _db.Entry(request).Property(p => p.RowVersion).OriginalValue = decision.RowVersion ?? [];
+
+        // All business rules live in ApprovalWorkflow (unit tested), not in the controller.
+        var result = action == ApprovalAction.Approved
+            ? _workflow.Approve(request, decision.ActedBy, decision.Notes)
+            : _workflow.Reject(request, decision.ActedBy, decision.Notes);
+
+        if (!result.Succeeded)
+        {
+            // Already decided by someone else: the form will not be shown, so use a page-level message.
+            if (!_workflow.CanDecide(request))
+            {
+                TempData["Error"] = result.Error;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return await RedisplayDetailsAsync(id, decision);
+        }
+
+        try
+        {
+            // One SaveChanges = one transaction: the status update and the audit record succeed or fail together.
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            TempData["Error"] =
+                $"{request.RequestNumber} was changed by someone else before your decision was saved. " +
+                "Review the current version and try again.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        TempData["Success"] = $"{request.RequestNumber} was {action.ToString().ToLowerInvariant()}.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    private async Task<IActionResult> RedisplayDetailsAsync(int id, DecisionViewModel decision)
+    {
+        var model = await BuildDetailsViewModelAsync(id, decision);
+        return model is null ? NotFound() : View(nameof(Details), model);
+    }
+
+    private async Task<PurchaseRequestDetailsViewModel?> BuildDetailsViewModelAsync(int id, DecisionViewModel? decision)
     {
         var request = await _db.PurchaseRequests
             .AsNoTracking()
@@ -109,15 +186,17 @@ public class PurchaseRequestsController : Controller
 
         if (request is null)
         {
-            return NotFound();
+            return null;
         }
 
-        return View(new PurchaseRequestDetailsViewModel
+        return new PurchaseRequestDetailsViewModel
         {
             Request = request,
             CanEdit = _workflow.CanEdit(request),
             CanDecide = _workflow.CanDecide(request),
-        });
+            // Fresh page: start from the current version. Redisplay: keep the user's input and original version.
+            Decision = decision ?? new DecisionViewModel { RowVersion = request.RowVersion },
+        };
     }
 
     // ---------- Create ----------

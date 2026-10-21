@@ -9,4 +9,6 @@ public class PurchaseRequestDetailsViewModel
     public bool CanEdit { get; init; }
 
     public bool CanDecide { get; init; }
+
+    public DecisionViewModel Decision { get; init; } = new();
 }
