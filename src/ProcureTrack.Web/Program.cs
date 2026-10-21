@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using ProcureTrack.Web.Data;
 using ProcureTrack.Web.Services;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Require a valid antiforgery token on every POST, PUT, PATCH, and DELETE in the app.
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
 builder.Services.AddDbContext<ProcureTrackDbContext>(options => 
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("ProcureTrack")

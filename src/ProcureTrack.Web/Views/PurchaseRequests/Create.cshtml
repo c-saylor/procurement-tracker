@@ -1,0 +1,26 @@
+@model PurchaseRequestFormViewModel
+@{
+    ViewData["Title"] = "New Purchase Request";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Purchase Requests</a></li>
+        <li class="breadcrumb-item active" aria-current="page">New request</li>
+    </ol>
+</nav>
+
+<h1 class="h3 mb-3">New Purchase Request</h1>
+
+@* novalidate turns off the browser's built-in popups so jQuery validation messages display consistently. *@
+<form asp-action="Create" method="post" class="card card-body" novalidate>
+    <partial name="_RequestFormFields" model="Model" />
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">Submit request</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -3,7 +3,10 @@
     ViewData["Title"] = "Purchase Requests";
 }
 
-<h1 class="h3 mb-3">Purchase Requests</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Purchase Requests</h1>
+    <a asp-action="Create" class="btn btn-primary">New request</a>
+</div>
 
 <form method="get" asp-action="Index" class="card card-body mb-3" role="search" aria-label="Filter purchase requests">
     <div class="row g-3">

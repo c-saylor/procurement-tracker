@@ -11,11 +11,20 @@
     </ol>
 </nav>
 
-<div class="mb-3">
-    <h1 class="h3 mb-1">@r.Title</h1>
-    <div class="text-body-secondary">
-        @r.RequestNumber &middot; <partial name="_StatusBadge" model="r.Status" />
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-1">@r.Title</h1>
+        <div class="text-body-secondary">
+            @r.RequestNumber &middot; <partial name="_StatusBadge" model="r.Status" />
+        </div>
     </div>
+    @if (Model.CanEdit)
+    {
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@r.Id" class="btn btn-outline-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-outline-danger">Delete</a>
+        </div>
+    }
 </div>
 
 @if (!Model.CanEdit)

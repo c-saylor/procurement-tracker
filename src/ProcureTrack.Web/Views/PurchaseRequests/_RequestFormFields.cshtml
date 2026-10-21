@@ -1,0 +1,62 @@
+@model PurchaseRequestFormViewModel
+
+@* Shows form-level errors such as the concurrency message. *@
+<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+<div class="row g-3">
+    <div class="col-12">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="DepartmentId" class="form-label"></label>
+        <select asp-for="DepartmentId" asp-items="Model.Departments" class="form-select">
+            <option value="">Select a department</option>
+        </select>
+        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="VendorId" class="form-label"></label>
+        <select asp-for="VendorId" asp-items="Model.Vendors" class="form-select">
+            <option value="">Select a vendor</option>
+        </select>
+        <span asp-validation-for="VendorId" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Amount" class="form-label"></label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input asp-for="Amount" type="number" step="0.01" min="0.01" max="1000000" class="form-control" />
+        </div>
+        <span asp-validation-for="Amount" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="RequiredByDate" class="form-label"></label>
+        <input asp-for="RequiredByDate" type="date" class="form-control" />
+        <span asp-validation-for="RequiredByDate" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="RequestedBy" class="form-label"></label>
+        <input asp-for="RequestedBy" class="form-control" autocomplete="name" />
+        <span asp-validation-for="RequestedBy" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="BusinessJustification" class="form-label"></label>
+        <textarea asp-for="BusinessJustification" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="BusinessJustification" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3" aria-describedby="descriptionHelp"></textarea>
+        <div id="descriptionHelp" class="form-text">Optional. Item details, quantities, or quote references.</div>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+</div>

@@ -33,3 +33,8 @@ body {
 .text-preline {
   white-space: pre-line;
 }
+
+/* Hide the validation summary box when there are no form-level errors. */
+.validation-summary-valid {
+  display: none;
+}

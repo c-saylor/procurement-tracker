@@ -1,0 +1,41 @@
+@model PurchaseRequest
+@{
+    ViewData["Title"] = $"Delete {Model.RequestNumber}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Purchase Requests</a></li>
+        <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">@Model.RequestNumber</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Delete</li>
+    </ol>
+</nav>
+
+<h1 class="h3 mb-3">Delete @Model.RequestNumber?</h1>
+
+<div class="alert alert-warning" role="alert">
+    This permanently removes the pending request. Approved and rejected requests cannot be
+    deleted because they are part of the audit trail.
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+            <dt class="col-sm-3">Department</dt>
+            <dd class="col-sm-9">@Model.Department.Name</dd>
+            <dt class="col-sm-3">Vendor</dt>
+            <dd class="col-sm-9">@Model.Vendor.Name</dd>
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9">@Model.Amount.ToString("C")</dd>
+            <dt class="col-sm-3">Requested by</dt>
+            <dd class="col-sm-9 mb-0">@Model.RequestedBy</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+    <button type="submit" class="btn btn-danger">Delete request</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+</form>

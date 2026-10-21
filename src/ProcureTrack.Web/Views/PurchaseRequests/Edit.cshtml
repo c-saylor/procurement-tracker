@@ -1,0 +1,27 @@
+@model PurchaseRequestFormViewModel
+@{
+    ViewData["Title"] = $"Edit {Model.RequestNumber}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Purchase Requests</a></li>
+        <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">@Model.RequestNumber</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+
+<h1 class="h3 mb-3">Edit @Model.RequestNumber</h1>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="card card-body" novalidate>
+    <input type="hidden" asp-for="RowVersion" />
+    <partial name="_RequestFormFields" model="Model" />
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
