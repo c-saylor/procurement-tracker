@@ -89,3 +89,5 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+// Lets the integration test project reference this app's entry point (WebApplicationFactory<Program>).
+public partial class Program { }

@@ -150,7 +150,7 @@ public class PurchaseRequestsController : Controller
         if (!result.Succeeded)
         {
             // Already decided by someone else: the form will not be shown, so use a page-level message.
-            if (!_workflow.CanDecide(request))
+            if (!_workflow.CanDecide(request) || IsOwner(request))
             {
                 TempData["Error"] = result.Error;
                 return RedirectToAction(nameof(Details), new { id });
