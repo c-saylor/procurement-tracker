@@ -266,6 +266,7 @@ Report data is provided by the stored procedure **`dbo.usp_ProcurementReport`**,
 - **Demo sign-in, not real authentication.** Users are chosen from a list without passwords.
 - **Identity is compared by display name.** `RequestedBy` and `ActedBy` store names; a production system would store a stable user ID.
 - **Only decisions are audited.** Edits to pending requests are protected by concurrency checks but are not recorded in a change history.
+- **No admin screens for departments and vendors.** Development data is seeded automatically; in production these would be loaded by a reviewed SQL script (see [deployment notes](docs/deployment.md)).
 - **Dates are stored and shown in UTC** (labeled as such), and the app formats numbers and dates for a single locale (en-US).
 - **No pagination** on the request list. That's fine for demo data volumes, but production volumes would need it.
 - **No Content Security Policy header** and no rate limiting.
