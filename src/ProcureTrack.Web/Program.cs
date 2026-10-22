@@ -67,6 +67,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Friendly pages for 400/403/404 responses that have no body; the original status code is preserved.
+app.UseStatusCodePagesWithReExecute("/Home/HttpStatus", "?code={0}");
+
 app.UseHttpsRedirection();
 
 // Single-locale internal app: format currency and dates as en-US regardless of the server's regional settings.

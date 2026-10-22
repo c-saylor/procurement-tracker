@@ -1,66 +1,104 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"] as string;
+    var action = ViewContext.RouteData.Values["action"] as string;
+
+    var isSignedIn = User.Identity?.IsAuthenticated == true;
+    var displayName = User.Identity?.Name ?? string.Empty;
+    var initials = string.Concat(displayName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => part[0]));
+    var roles = string.Join(", ", User.FindAll(ClaimTypes.Role).Select(c => c.Value));
+
+    var onDashboard = controller == "Home" && action == "Index";
+    var onRequests = controller == "PurchaseRequests" && action != "Create";
+    var onCreate = controller == "PurchaseRequests" && action == "Create";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ProcureTrack</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] – ProcureTrack</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ProcureTrack.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+    @* Lets keyboard and screen-reader users jump past the navigation. Visible only when focused. *@
+    <a class="visually-hidden-focusable btn btn-light position-absolute top-0 start-0 m-2 z-3" href="#main-content">
+        Skip to main content
+    </a>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProcureTrack</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <ul class="navbar-nav flex-grow-1">
+        <nav class="navbar navbar-expand-md app-navbar" data-bs-theme="dark" aria-label="Main navigation">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark" aria-hidden="true">PT</span>
+                    ProcureTrack
+                </a>
+
+                @if (isSignedIn)
+                {
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav"
+                            aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="main-nav">
+                        <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
+                                <a class="nav-link @(onDashboard ? "active" : null)" aria-current="@(onDashboard ? "page" : null)"
+                                   asp-controller="Home" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="PurchaseRequests" asp-action="Index">Purchase Requests</a>
+                                <a class="nav-link @(onRequests ? "active" : null)" aria-current="@(onRequests ? "page" : null)"
+                                   asp-controller="PurchaseRequests" asp-action="Index">Purchase Requests</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
+                            @if (User.IsInRole(AppRoles.Requester))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(onCreate ? "active" : null)" aria-current="@(onCreate ? "page" : null)"
+                                       asp-controller="PurchaseRequests" asp-action="Create">New Request</a>
+                                </li>
+                            }
                         </ul>
-                    }
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <div class="d-flex flex-wrap align-items-center gap-2 ms-auto">
-                            <span class="navbar-text small">
-                                Signed in as <strong>@User.Identity.Name</strong>
-                                <span class="text-body-secondary">(@string.Join(", ", User.FindAll(ClaimTypes.Role).Select(c => c.Value)))</span>
-                            </span>
-                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Sign out</button>
-                            </form>
+
+                        <div class="dropdown">
+                            <button class="btn nav-link dropdown-toggle d-flex align-items-center gap-2" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="avatar-initials" aria-hidden="true">@initials</span>
+                                <span>@displayName</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="light">
+                                <li><span class="dropdown-item-text small text-body-secondary">Roles: @roles</span></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item">Sign out</button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <main id="main-content" class="flex-grow-1 py-4" tabindex="-1">
+        <div class="container">
             <partial name="_Alerts" />
             @RenderBody()
-        </main>
-    </div>
+        </div>
+    </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ProcureTrack - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="app-footer border-top bg-body py-3 mt-auto">
+        <div class="container d-flex flex-wrap justify-content-between gap-2 text-body-secondary">
+            <span>ProcureTrack &middot; Portfolio demonstration built with ASP.NET Core MVC</span>
+            <span>All people, vendors, and data are fictional. Not affiliated with any real organization.</span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProcureTrack.Web.Data;
@@ -91,11 +92,16 @@ public class HomeController : Controller
         return View(model);
     }
 
-    public IActionResult Privacy()
+    // Reached via UseStatusCodePagesWithReExecute (for example, after NotFound() or a failed antiforgery check).
+    // The response keeps its original status code; this only supplies a friendly body.
+    [AllowAnonymous]
+    public IActionResult HttpStatus(int code)
     {
-        return View();
+        return View(code);
     }
 
+    // Reached via UseExceptionHandler in Production. Shows a reference ID, never exception details.
+    [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

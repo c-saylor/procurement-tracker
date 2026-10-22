@@ -1,0 +1,23 @@
+@model int
+@{
+    // A swtich expression returning a tuple
+    var (title, message) = Model switch
+    {
+        400 => ("The request coud not be processed",
+        "The form may have expired. Go back, refresh the page, and try again."),
+        403 => ("Access denied",
+        "Your role does not permit this action. If you believe this is an error, contact your administrator."),
+        404 => ("Page not found",
+        "The page or purchase request you are looking for does not exist or may have been deleted."),
+        _ => ("Something went wrong",
+        "The request could not be completed."),
+    };
+    ViewData["Title"] = title;
+}
+
+<div class="text-center py-5">
+    <p class="display-6 fw-semibold text-body-secondary mb-1">@Model</p>
+    <h1 class="h3">@title</h1>
+    <p class="text-body-secondary">@message</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to dashboard</a>
+</div>"
