@@ -108,3 +108,8 @@ main:focus {
 #main-nav .dropdown .dropdown-toggle {
   color: #fff !important;
 }
+
+/* .table-responsive only needs horizontal scrolling; prevent a stray vertical scrollbar. */
+.table-responsive {
+  overflow-y: hidden;
+}
